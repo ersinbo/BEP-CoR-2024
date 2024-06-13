@@ -1,4 +1,5 @@
 #!/home/bepgroup/Desktop/peract_env/bin/python3
+# all credit for this script goes to Renchi Zhang as he is the creator, and our supervisor for this project
 # this script is responsible for resizing the images to 128 x 128
 # the peract expects to receive 128 x 128, and because most cameras do not have an 128 x 128 image this script is necessary for executing the trained model
 # not using this script will result in a size mismatch
