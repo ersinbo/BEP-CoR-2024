@@ -1,0 +1,51 @@
+settings:
+  ask_to_execute: True
+  re_act_before_exec: False
+
+ros:
+  loop_rate: 25 # Hz
+
+topics:
+  front_rgb: '/resized_camera_rgb'
+  front_depth: '/resized_camera_depth'
+  front_camera_info: '/resized_camera_info'
+
+  joy_state: '/keys_state'
+  joy_pose: '/ee_pose'
+
+  joint_states: '/joint_states'
+  target_pose: 'ee_pose'
+
+  pred_voxel: '/peract_pred_voxel'
+
+agent:
+  seed_path: /home/bepgroup/Desktop/bepproject/peract/conf/C2FARM_seeds_out_of_40000
+  weight: 36700
+
+  episode_length: 25
+
+  camera_resolution: [128, 128]
+  scene_bounds: [0.2, -0.5, -0.5 , 1.0, 0.5, 0.5]
+  #[0.3, -0.5, -0.5 , 1.0, 0.5, 0.5]
+  
+  #[0.1, -0.2, -1.5, 1, 0.4, 1]
+
+  # rotation_resolution: 5
+  #voxel_sizes: [64]
+  # num_latents: 1024
+  # latent_dim: 512
+
+  voxel_patch_size: 1
+  voxel_patch_stride: 1
+
+  # lang_fusion_type: 'concat'
+
+logs:
+  save: True
+  log_path: '/home/bepgroup/Desktop/bepproject/catkin_ws/src/dvnets_franka/franka_data'
+
+  episode_id: 0
+  task: 'Lego'
+
+  save_all_frames: True
+  save_all_folder: 'training_logs_'

@@ -1,0 +1,19 @@
+<launch>
+    <!-- (start your robot's MoveIt! stack, e.g. include its moveit_planning_execution.launch) -->
+    <!-- (start your tracking system's ROS driver) -->
+    <arg name="namespace_prefix" default="panda_eob_calib"/>
+    <arg name="start_rviz" default="true"/>
+    <arg name="move_group_namespace" default="/"/>
+    <arg name="rviz_config_file" default="$(find easy_handeye)/launch/rviz_easy_handeye.config" doc="the path to the rviz config file to be opened" />
+
+
+    <include file="$(find easy_handeye)/launch/publish.launch">
+      <arg name="namespace_prefix" value="$(arg namespace_prefix)"/> <!-- use the same namespace that you used during calibration! -->
+      <arg name="eye_on_hand" value="false"/>
+    </include>
+
+    <!-- start Rviz with our configuration, in the move group's namespace -->
+    <node if="$(arg start_rviz)" ns="$(arg move_group_namespace)" name="$(anon rviz)" pkg="rviz" type="rviz" respawn="true"
+          args="-d $(arg rviz_config_file)" output="screen" />
+
+  </launch>

@@ -1,0 +1,27 @@
+settings:
+  ask_to_save: False
+  replay_from_prev_pose: True
+
+ros:
+  loop_rate: 10 # Hz
+
+topics:
+  front_rgb: '/resized_camera_rgb'
+  front_depth: '/resized_camera_depth'
+  front_camera_info: '/resized_camera_info'
+
+  joy_state: '/keys_state'
+  joy_pose: '/eepose'
+
+  joint_states: '/joint_states'
+  target_pose: '/eepose'
+
+
+demo:
+  task: 'grasp_lego'
+  save_path: '/home/bepgroup/Desktop/bepproject/catkin_ws/src/dvnets_franka/franka_data'
+  variation: 0
+  episode: 8
+  random_seed: 0
+  
+
