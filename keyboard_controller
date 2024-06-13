@@ -1,0 +1,77 @@
+#!/home/bepgroup/Desktop/peract_env/bin/python3
+# this script runs in the background waiting for certain keyboard keys to be pressed
+
+import rospy
+from std_msgs.msg import Int32MultiArray
+from pynput import keyboard
+import threading
+
+# Global variable to store the state of keys
+keys_pressed = [0, 0, 0, 0]
+
+# Function to toggle the fourth element of keys_pressed between 0 and 1
+def toggle_o():
+    global keys_pressed
+    keys_pressed[3] = 1 - keys_pressed[3]  # Toggle between 0 and 1
+
+# Callback function for key press event
+def on_press(key):
+    global keys_pressed
+    try:
+        if key.char == 'p':
+            keys_pressed[0] = 1
+        elif key.char == 'g':
+            keys_pressed[1] = 1
+        elif key.char == 'b':
+            keys_pressed[2] = 1
+        elif key.char == 'o':
+            toggle_o()
+    except AttributeError:
+        pass
+
+# Callback function for key release event
+def on_release(key):
+    global keys_pressed
+    try:
+        if key.char == 'p':
+            keys_pressed[0] = 0
+        elif key.char == 'g':
+            keys_pressed[1] = 0
+        elif key.char == 'b':
+            keys_pressed[2] = 0
+    except AttributeError:
+                if key == keyboard.Key.f6:
+                    rospy.signal_shutdown('F6 key pressed')
+                    return False
+                pass
+
+# Thread function to listen for keyboard events
+def keyboard_listener():
+    with keyboard.Listener(
+            on_press=on_press,
+            on_release=on_release) as listener:
+        listener.join()
+
+# ROS node initialization
+rospy.init_node('key_publisher', anonymous=True)
+pub = rospy.Publisher('keys_state', Int32MultiArray, queue_size=10)
+
+# Start the keyboard listener thread
+keyboard_thread = threading.Thread(target=keyboard_listener)
+keyboard_thread.start()
+
+# Main loop to publish key state
+rate = rospy.Rate(10)  # 10 Hz
+print("Press F6 to exit")
+while not rospy.is_shutdown():
+    key_state_msg = Int32MultiArray(data=keys_pressed)
+    pub.publish(key_state_msg)
+    rate.sleep()
+
+
+
+
+
+
+
+
