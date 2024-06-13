@@ -1,0 +1,104 @@
+#!/home/bepgroup/Desktop/peract_env/bin/python3
+# this script is responsible for resizing the images to 128 x 128
+# the peract expects to receive 128 x 128, and because most cameras do not have an 128 x 128 image this script is necessary for executing the trained model
+# not using this script will result in a size mismatch
+import rospy
+
+from cv_bridge import CvBridge, CvBridgeError
+
+from copy import deepcopy
+
+from sensor_msgs.msg import CameraInfo, Image, CompressedImage
+
+import numpy as np
+
+import cv2
+
+
+
+def resize_camera_info_cb(msg):
+
+    resized_cam_info  = deepcopy(msg)
+
+    k_array = np.array(resized_cam_info.K)
+
+    resized_cam_info.height = 128
+
+    resized_cam_info.width = 128
+
+    x_scale = float(128/960)
+
+    y_scale = float(128/540)
+
+    k_array[0] = k_array[0] * x_scale
+
+    k_array[2] = k_array[2] * x_scale
+
+    k_array[4] = k_array[4] * y_scale
+
+    k_array[5] = k_array[5] * y_scale
+
+    resized_cam_info.K = k_array.tolist()
+
+    intri_pub.publish(resized_cam_info)
+
+
+
+def resize_camera_rgb_cb(msg):
+
+    print("resize_camera_rgb_cb")
+
+    front_rgb = cv_bridge.imgmsg_to_cv2(msg, "rgb8") # rgb or bgr?
+
+    resized_rgb = cv2.resize(front_rgb, (128, 128),  interpolation = cv2.INTER_NEAREST) 
+
+    image_message = cv_bridge.cv2_to_imgmsg(resized_rgb, encoding="rgb8")
+
+    rgb_pub.publish(image_message)
+
+    print("published resize_camera_rgb_cb")
+
+
+
+def resize_camera_depth_cb(msg):
+
+    front_depth = cv_bridge.imgmsg_to_cv2(msg, "passthrough")
+
+    resized_depth = cv2.resize(front_depth, (128, 128),  interpolation = cv2.INTER_NEAREST) 
+
+    depth_message = cv_bridge.cv2_to_imgmsg(resized_depth, encoding="passthrough")
+
+    depth_pub.publish(depth_message)
+
+
+
+rospy.init_node('pub_intri_now')
+
+
+
+cv_bridge = CvBridge()
+
+raw_camera_intri = '/zed2/zed_node/rgb/camera_info'
+
+raw_camera_rgb = '/zed2/zed_node/rgb/image_rect_color' 
+
+raw_camera_depth = '/zed2/zed_node/depth/depth_registered' 
+
+
+intri_pub = rospy.Publisher('/resized_camera_info', CameraInfo, queue_size=50)
+
+rgb_pub = rospy.Publisher('/resized_camera_rgb', Image, queue_size=50)
+
+depth_pub = rospy.Publisher('/resized_camera_depth', Image, queue_size=50)
+
+
+
+resize_camera_info_sub = rospy.Subscriber(raw_camera_intri, CameraInfo, resize_camera_info_cb)
+
+resize_camera_rgb_sub = rospy.Subscriber(raw_camera_rgb, Image, resize_camera_rgb_cb)
+
+resize_camera_depth_sub = rospy.Subscriber(raw_camera_depth, Image, resize_camera_depth_cb)
+
+
+
+rospy.spin()
