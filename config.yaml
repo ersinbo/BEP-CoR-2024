@@ -1,0 +1,51 @@
+ddp:
+    master_addr: "localhost"
+    master_port: "29500"
+    num_devices: 2
+
+rlbench:
+    task_name: "single"
+    tasks: [grasp_lego]
+    demos: 9
+    demo_path: /home/bepgroup/BEPproject/peract/real_world_data
+    episode_length: 25
+    cameras: ['front']
+    camera_resolution: [128, 128]
+    scene_bounds: [0.2, -0.5, -0.5 , 1.0, 0.5, 0.5]
+    include_lang_goal_in_obs: True
+
+replay:
+    batch_size: 2
+    timesteps: 1
+    prioritisation: False
+    task_uniform: False # uniform sampling of tasks for multi-task buffers
+    use_disk: True
+    path: '/tmp/arm/replay' # only used when use_disk is True.
+    max_parallel_processes: 16
+
+framework:
+    log_freq: 50
+    save_freq: 50
+    train_envs: 1
+    replay_ratio: ${replay.batch_size}
+    transitions_before_train: 200
+    tensorboard_logging: True
+    csv_logging: True
+    training_iterations: 40000
+    gpu: 0
+    env_gpu: 0
+    logdir: '/tmp/arm_test/'
+    logging_level: 20 # https://docs.python.org/3/library/logging.html#levels
+    seeds: 1
+    start_seed: 10
+    load_existing_weights: True
+    num_weights_to_keep: 60 # older checkpoints will be deleted chronologically
+    num_workers: 0
+    record_every_n: 5
+
+defaults:
+    - method: PERACT_BC
+
+hydra:
+    run:
+        dir: ${framework.logdir}/${rlbench.task_name}/${method.name}
